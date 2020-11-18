@@ -1,0 +1,137 @@
+<template>
+  <div class="slider" ref="slider">
+    <div class="slider-group" ref="sliderGroup">
+      <slot></slot>
+    </div>
+    <div class="dots">
+      <span class="dot" v-for="(item,index) in dots" :key="index" :class="{'active': currentPageIndex === index}"></span>
+    </div>
+  </div>
+</template>
+
+<script>
+  import BetterScroll  from 'better-scroll'
+  import { addClass } from 'common/js/dom'
+  export default {
+    name: "index",
+    props: {
+      loop: {
+        type: Boolean,
+        default: true
+      },
+      autoplay: {
+        type: Boolean,
+        default: true
+      },
+      interval: {
+        type: Number,
+        default: 3000
+      }
+    },
+    data() {
+      return {
+        dots: [],
+        currentPageIndex: 0
+      }
+    },
+    mounted() {
+      this.$nextTick(() => {
+        this._setSliderWidth();
+        this._initDots();
+        this._initSlider();
+      });
+    },
+    methods: {
+      // 初始化轮播图
+      _initSlider() {
+        this.slider = new BetterScroll(this.$refs.slider, {
+          scrollX: true,  // 允许横向滚动
+          scrollY: false, // 不允许纵向滚动
+          momentum: false, // 当快速在屏幕上滑动一段距离的时候,会根据滑动的距离和时间计算出动量,并生成滚动动画,设置为true则开启动画。
+          click: true,
+          slide: { // 该属性是给 slider 组件使用的，普通的列表滚动不需要配置
+            autoplay: this.autoplay,
+            loop: this.loop,
+            interval: this.interval,
+            threshold: 0.1, // 用手指滑动时页面可切换的阈值,大于这个阈值可以滑动的下一页
+            speed: 400,  // 轮播图切换的动画时间
+          }
+        });
+
+        // 每次滚动结束时触发的事件
+        this.slider.on('scrollEnd',() => {
+          let pageIndex = this.slider.getCurrentPage().pageX;
+          this.currentPageIndex = pageIndex;
+        });
+      },
+      // 初始化宽度
+      _setSliderWidth() {
+        let sliderGroup = this.$refs.sliderGroup;
+        this.children = sliderGroup.children;
+
+        let sliderWidth = this.$refs.slider.clientWidth,
+            width = 0;
+        for (let i = 0; i < this.children.length; i++) {
+          let child = this.children[i];
+          addClass(child,'slider-item');
+
+          child.style.width = sliderWidth + 'px';
+          width += sliderWidth;
+        }
+
+        // 当设置为无缝滚动时,左右两边各添加多一张图片的宽度
+        if (this.loop) {
+          width += 2 * sliderWidth;
+        }
+        // slider-item图片的父容器等于每张图片宽度的总和
+        sliderGroup.style.width = width + 'px';
+      },
+      _initDots() {
+        this.dots = new Array(this.children.length);
+      }
+    }
+  }
+</script>
+
+<style scoped lang="stylus">
+  @import "~common/stylus/variable"
+
+  .slider
+    min-height: 1px
+    .slider-group
+      position: relative
+      overflow: hidden
+      white-space: nowrap
+      .slider-item
+        float: left
+        box-sizing: border-box
+        overflow: hidden
+        text-align: center
+        a
+          display: block
+          width: 100%
+          overflow: hidden
+          text-decoration: none
+        img
+          display: block
+          width: 100%
+    .dots
+      position: absolute
+      right: 0
+      left: 0
+      bottom: 12px
+      transform: translateZ(1px)
+      text-align: center
+      font-size: 0
+      .dot
+        display: inline-block
+        margin: 0 4px
+        width: 8px
+        height: 8px
+        border-radius: 50%
+        background: $color-text-l
+        &.active
+          width: 20px
+          border-radius: 5px
+          background: $color-text-ll
+</style>
