@@ -36,14 +36,14 @@
     },
     mounted() {
       this.$nextTick(() => {
-        this._setSliderWidth();
-        this._initDots();
-        this._initSlider();
+        this.setSliderWidth();
+        this.initDots();
+        this.initSlider();
       });
     },
     methods: {
       // 初始化轮播图
-      _initSlider() {
+      initSlider() {
         this.slider = new BetterScroll(this.$refs.slider, {
           scrollX: true,  // 允许横向滚动
           scrollY: false, // 不允许纵向滚动
@@ -65,7 +65,7 @@
         });
       },
       // 初始化宽度
-      _setSliderWidth() {
+      setSliderWidth() {
         let sliderGroup = this.$refs.sliderGroup;
         this.children = sliderGroup.children;
 
@@ -86,7 +86,7 @@
         // slider-item图片的父容器等于每张图片宽度的总和
         sliderGroup.style.width = width + 'px';
       },
-      _initDots() {
+      initDots() {
         this.dots = new Array(this.children.length);
       }
     }

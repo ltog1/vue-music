@@ -3,16 +3,27 @@
     <div class="back" @click="back">
       <i class="icon-back"></i>
     </div>
-    <h1 class="title">{{ title }}</h1>
+    <h1 class="title" ref="title">{{ title }}</h1>
     <div class="bg-image" :style="`background-image: url(${bgImage})`" ref="bgImage">
+      <div class="play-wrapper" ref="play" v-if="songs.length">
+        <div class="play">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
       <div class="filter"></div>
     </div>
 
-    <scroll :data="songs" class="list" ref="list">
+    <div class="bg-layer" ref="bgLayer"></div>
+    <scroll class="list"
+            ref="list"
+            :data="songs"
+            :listenScroll="listenScroll"
+            :probeType="probeType"
+            @scroll="ListScroll">
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
       </div>
-
       <loading v-if="!songs.length"/>
     </scroll>
 
@@ -52,16 +63,40 @@
       };
     },
     mounted() {
-      let bgImageHieght = this.$refs.bgImage.clientHeight,
-          list = this.$refs.list;
-      list.$el.style.top = `${bgImageHieght}px`;
+      this.bgImageHieght = this.$refs.bgImage.clientHeight;
+      this.titleHieght = this.$refs.title.clientHeight;
+      this.maxTransformY = -(this.bgImageHieght - this.titleHieght);
+      this.$refs.list.$el.style.top = `${this.bgImageHieght}px`;
     },
     created() {
-
+      this.listenScroll = true; // 传递给scroll组件,是否派发滚动事件
+      this.probeType = 3; // 传递给scroll组件,派发滚动事件
     },
     methods: {
       back() {
         this.$router.back();
+      },
+      ListScroll(po) {
+        let zIndex = 0, height = 0, scale = 1, paddingTop = '70%', display = 'block',
+            translateY = Math.max(po.y, this.maxTransformY),
+            percent = Math.abs(po.y / this.bgImageHieght);
+        if (translateY > 0) {
+          scale += percent;
+          zIndex = 10;
+        }
+
+        if (translateY <= this.maxTransformY) {
+          zIndex = 10;
+          height = this.titleHieght;
+          paddingTop = 0;
+          display = 'none';
+        }
+        this.$refs.bgImage.style.zIndex = zIndex;
+        this.$refs.bgImage.style.height = `${height}px`;
+        this.$refs.bgImage.style.paddingTop = `${paddingTop}`;
+        this.$refs.bgImage.style.transform = `scale(${scale})`;
+        this.$refs.bgLayer.style.transform = `translate3d(0,${translateY}px,0)`;
+        this.$refs.play.style.display = display;
       }
     }
   }
@@ -148,11 +183,11 @@
       bottom: 0
       width: 100%
       background: $color-background
-    .song-list-wrapper
-      padding: 20px 30px
-    .loading-container
-      position: absolute
-      width: 100%
-      top: 50%
-      transform: translateY(-50%)
+      .song-list-wrapper
+        padding: 20px 30px
+      .loading-container
+        position: absolute
+        width: 100%
+        top: 50%
+        transform: translateY(-50%)
 </style>

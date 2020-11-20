@@ -18,7 +18,7 @@
     </ul>
 
     <div class="list-shortcut">
-      <ul ref="shortcutList" @touchstart.stop.prevent="alphabetTouchStart" @touchmove.stop.prevent="alphabetTouchMove" @touchend="alphabetTouchEnd">
+      <ul ref="shortcutList" @touchstart.stop.prevent="alphabetTouchStart" @touchmove.stop.prevent="alphabetTouchMove">
         <li class="item"
           v-for="(item,key,index) in data"
           :key="key"
@@ -89,8 +89,7 @@
       this.touch = {
         itemHeight: 0,
         startY: 0,
-        dataLength: 0,
-        touchStart: false
+        dataLength: 0
       }
       this.listenScroll = true; // 传递给scroll组件,是否派发滚动事件
       this.probeType = 3; // 传递给scroll组件,派发滚动事件
@@ -104,20 +103,17 @@
         const index = +getDataAttr(e.target,'index'); // 获取自定义属性
         this.scrollToElement(this.$refs.listGroup,index);
 
-        let touch = this.touch,
-            item = document.querySelector('.item');
+        let touch = this.touch;
         this.currentIndex = index;
-        touch.itemHeight = item.offsetHeight;
+        touch.itemHeight = this.$refs.shortcutList.children[0].clientHeight;
         touch.startY = this.$refs.shortcutList.getBoundingClientRect().y;
         touch.dataLength = Object.keys(this.data).length;
-        touch.touchStart = true;
       },
       alphabetTouchMove(e) {
-        if (this.touchStart) {
-          if (this.timer) {
-            clearTimeout(this.timer);
-          }
+        if (this.timer) {
+          clearTimeout(this.timer);
         }
+
         this.timer = setTimeout(() => {
           let touch = this.touch;
           const clientY = e.touches[0].clientY;
@@ -127,9 +123,6 @@
             this.scrollToElement(this.$refs.listGroup,index);
           }
         },6);
-      },
-      alphabetTouchEnd() {
-        this.touchStart = false;
       },
       // 计算每个字母对应歌手区域的高度,累加高度
       calculateHeight() {
