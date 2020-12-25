@@ -11,17 +11,32 @@ const routes = [
   {
     path: '/recommend',
     name: 'recommend',
-    component: () => import(/* webpackChunkName: "recommend" */ 'components/recommend/index')
+    component: () => import(/* webpackChunkName: "recommend" */ 'components/recommend/index'),
+    children: [{
+      path: ':id',
+      name: 'recommend-detail',
+      component: () => import(/* webpackChunkName: "recommend-detail" */ 'components/recommend-detail/index'),
+    }]
   },
   {
     path: '/rank',
     name: 'rank',
-    component: () => import(/* webpackChunkName: "rank" */ 'components/rank/index')
+    component: () => import(/* webpackChunkName: "rank" */ 'components/rank/index'),
+    children: [{
+      path: ':id',
+      name: 'top-list',
+      component: () => import(/* webpackChunkName: "top-list" */ 'components/top-list/index'),
+    }]
   },
   {
     path: '/search',
     name: 'search',
-    component: () => import(/* webpackChunkName: "search" */ 'components/search/index')
+    component: () => import(/* webpackChunkName: "search" */ 'components/search/index'),
+    children: [{
+      path: ':id',
+      name: 'search-detail',
+      component: () => import(/* webpackChunkName: "search-detail" */ 'components/singer-detail/index'),
+    }]
   },
   {
     path: '/singer',

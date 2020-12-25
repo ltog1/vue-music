@@ -1,12 +1,12 @@
 
-export const addClass = (el,className) => {
+export function addClass(el,className) {
   if (el.classList.contains(className)) {
     return className;
   }
   el.classList.add(className);
 }
 
-export const getDataAttr = (el,name) => {
+export function getDataAttr(el,name) {
   const prefix = 'data-';
   return el.getAttribute(prefix + name);
 }

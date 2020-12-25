@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // 获取轮播图
-export const getRecommend = () => {
+export function getRecommend() {
   const url = '/api/getTopBanner';
   const params = Object.assign({}, {
     platform: 'yqq.json',
@@ -66,7 +66,7 @@ export const getRecommend = () => {
 
 // 获取热门歌单推荐
 // 向自己的server端发起请求
-export const getDiscList = () => {
+export function getDiscList() {
   const url = '/api/getDiscList';
   const params = Object.assign({}, {
     platform: 'yqq',
@@ -85,6 +85,29 @@ export const getDiscList = () => {
   }).then(res => {
     if (res.code === 0) {
       return res.data;
+    }
+  })
+}
+
+// 获取歌单列表
+export function getSongList(disstid) {
+  const url = '/api/getCdInfo';
+  const params = Object.assign({}, {
+    disstid,
+    type: 1,
+    json: 1,
+    utf8: 1,
+    onlysong: 0,
+    platform: 'yqq',
+    hostUin: 0,
+    needNewCode: 0
+  });
+
+  return axios.get(url, {
+    params
+  }).then(res => {
+    if (res.code === 0) {
+      return res.cdlist[0];
     }
   })
 }

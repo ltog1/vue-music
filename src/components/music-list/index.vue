@@ -1,12 +1,10 @@
 <template>
   <div class="music-list">
-    <div class="back" @click="back">
-      <i class="icon-back"></i>
-    </div>
+    <div class="back" @click="back"><i class="icon-back"></i></div>
     <h1 class="title" ref="title">{{ title }}</h1>
     <div class="bg-image" :style="`background-image: url(${bgImage})`" ref="bgImage">
       <div class="play-wrapper" ref="play" v-if="songs.length">
-        <div class="play">
+        <div class="play" @click="randomClick">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -21,9 +19,7 @@
             :listenScroll="listenScroll"
             :probeType="probeType"
             @scroll="ListScroll">
-      <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
-      </div>
+      <div class="song-list-wrapper"><song-list :rank="rank" :songs="songs" @selectItem="selectItem" /></div>
       <loading v-if="!songs.length"/>
     </scroll>
 
@@ -34,6 +30,8 @@
   import SongList from 'base/song-list/index'
   import Scroll from 'base/scroll/index'
   import Loading from 'base/loading/index'
+  import { mapActions } from 'vuex'
+  import { playListMixin } from 'common/js/mixin'
   export default {
     name: "index",
     components: {
@@ -41,6 +39,7 @@
       Scroll,
       Loading
     },
+    mixins: [playListMixin],
     props: {
       bgImage: {
         type: String,
@@ -56,11 +55,10 @@
           return [];
         }
       },
-    },
-    data() {
-      return {
-
-      };
+      rank: {
+        type: Boolean,
+        default: false
+      }
     },
     mounted() {
       this.bgImageHieght = this.$refs.bgImage.clientHeight;
@@ -73,6 +71,11 @@
       this.probeType = 3; // 传递给scroll组件,派发滚动事件
     },
     methods: {
+      $_handlerPlayList(playlist) {
+        const bottom = playlist.length ? '60px' : '';
+        this.$refs.list.$el.style.bottom = bottom;
+        this.$refs.list.refresh();
+      },
       back() {
         this.$router.back();
       },
@@ -97,7 +100,20 @@
         this.$refs.bgImage.style.transform = `scale(${scale})`;
         this.$refs.bgLayer.style.transform = `translate3d(0,${translateY}px,0)`;
         this.$refs.play.style.display = display;
-      }
+      },
+      randomClick() {
+        this.randomPlay({ list: this.songs });
+      },
+      async selectItem(item,index) {
+        this.selectPlay({
+          list: this.songs,
+          index
+        });
+      },
+      ...mapActions([
+        'selectPlay',
+        'randomPlay'
+      ]),
     }
   }
 </script>

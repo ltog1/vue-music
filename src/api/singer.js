@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // 获取歌手列表
-export const getSingerList = () => {
+export function getSingerList() {
   const url = '/api/getSingerList';
   const params = Object.assign({}, {
     channel: 'singer',
@@ -24,7 +24,7 @@ export const getSingerList = () => {
 }
 
 // 获取歌手列表详情
-export const getSingerDetail = (singerId) => {
+export function getSingerDetail(singerId) {
   const url = '/api/getSingerDetail';
   const params = Object.assign({}, {
     hostUin: 0,

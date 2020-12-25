@@ -66,13 +66,28 @@
 
         this.scroll = new BetterScroll(this.$refs.wrapper, {
           click: this.click,
-          probeType: this.probeType,
+          probeType: this.probeType
         });
 
+        // 派发滚动事件
         if (this.listenScroll) {
           this.scroll.on('scroll',pos => {
             this.$emit('scroll',pos);
           });
+        }
+
+        if (this.pullup) {
+          this.scroll.on('scrollEnd',() => {
+            if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+              this.$emit('scrollToEnd');
+            }
+          })
+        }
+
+        if (this.beforeScroll) {
+          this.scroll.on('beforeScrollStart',() => {
+            this.$emit('beforeScrollStart');
+          })
         }
       },
       // 禁用 BetterScroll，DOM 事件（如 touchstart、touchmove、touchend）的回调函数不再响应。

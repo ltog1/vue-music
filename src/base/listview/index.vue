@@ -40,6 +40,9 @@
   import Scroll from 'base/scroll/index'
   import Loading from 'base/loading/index'
   import { getDataAttr } from 'common/js/dom'
+
+  const fixedHeight = 30;
+
   export default {
     name: "index",
     components: {
@@ -64,7 +67,6 @@
     watch: {
       diffY(newDiffY) {
         newDiffY += 10;
-        let fixedHeight = this.$refs.fixedTitle.clientHeight ? this.$refs.fixedTitle.clientHeight : 30;
 
         let move = (newDiffY > 0 && newDiffY <= fixedHeight) ? newDiffY - fixedHeight : 0;
         if (this.move === move) {
@@ -89,6 +91,7 @@
       this.touch = {
         itemHeight: 0,
         startY: 0,
+
         dataLength: 0
       }
       this.listenScroll = true; // 传递给scroll组件,是否派发滚动事件
@@ -100,13 +103,14 @@
         this.$emit('select',singer);
       },
       alphabetTouchStart(e) {
-        const index = +getDataAttr(e.target,'index'); // 获取自定义属性
+        const index = +getDataAttr(e.target,'index'), // 获取自定义属性
+          shortcutList = this.$refs.shortcutList;
         this.scrollToElement(this.$refs.listGroup,index);
 
         let touch = this.touch;
         this.currentIndex = index;
-        touch.itemHeight = this.$refs.shortcutList.children[0].clientHeight;
-        touch.startY = this.$refs.shortcutList.getBoundingClientRect().y;
+        touch.itemHeight = shortcutList.children[0].clientHeight ? shortcutList.children[0].clientHeight : 0;
+        touch.startY = shortcutList.getBoundingClientRect().y;
         touch.dataLength = Object.keys(this.data).length;
       },
       alphabetTouchMove(e) {
@@ -164,6 +168,9 @@
         const element = el[index];
         this.$refs.scroll.scrollToElement(element,300);
       },
+      refresh() {
+        this.$refs.scroll.refresh();
+      }
     }
   }
 </script>

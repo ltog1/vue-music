@@ -7,7 +7,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import { getSingerDetail } from 'api/singer'
-  import { createSong } from 'common/js/song'
+  import { createSong,isValidMusic,processSongsUrl } from 'common/js/song'
   import MusicList from 'components/music-list/index'
   export default {
     name: "index",
@@ -35,7 +35,9 @@
           return;
         }
         getSingerDetail(id).then(res => {
-          this.songs = this.normalizeSongs(res.list);
+          processSongsUrl(this.normalizeSongs(res.list)).then((songs) => {
+            this.songs = songs;
+          })
         })
       },
       // 序列化歌手详情数据
@@ -43,7 +45,9 @@
         let result = [];
         list.forEach(item => {
           let { musicData } = item;
-          result.push(createSong(musicData));
+          if (isValidMusic(musicData)) {
+            result.push(new createSong(musicData));
+          }
         });
         return result;
       }

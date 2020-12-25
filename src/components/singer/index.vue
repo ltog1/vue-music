@@ -1,6 +1,6 @@
 <template>
-  <div class="singer">
-    <list-view :data="singer" @select="select"/>
+  <div class="singer" ref="singer">
+    <list-view :data="singer" @select="select" ref="listView"/>
     <router-view></router-view>
   </div>
 </template>
@@ -9,8 +9,12 @@
   import { getSingerList } from 'api/singer'
   import ListView from 'base/listview/index'
   import { mapMutations } from 'vuex'
+  import { playListMixin } from 'common/js/mixin'
+  import singer from 'common/js/singer'
+
   export default {
     name: "index",
+    mixins: [playListMixin],
     components: {
       ListView
     },
@@ -23,6 +27,11 @@
       this.getSingerList();
     },
     methods: {
+      $_handlerPlayList(playlist) {
+        const bottom = playlist.length ? '60px' : '';
+        this.$refs.singer.style.bottom = bottom;
+        this.$refs.listView.refresh();
+      },
       // 获取歌手列表
       getSingerList() {
         getSingerList().then(res => {
@@ -41,19 +50,17 @@
             const item = list[j];
 
             if (i === 0 && j <= 9) {
-              map['热门'].push({
+              map['热门'].push(new singer({
                 id: item.Fsinger_mid,
-                name: item.Fsinger_name,
-                icon: `https://y.gtimg.cn/music/photo_new/T001R150x150M000${item.Fsinger_mid}.jpg?max_age=2592000`
-              });
+                name: item.Fsinger_name
+              }));
             }
 
             if (en === item.Findex) {
-              map[en].push({
+              map[en].push(new singer({
                 id: item.Fsinger_mid,
-                name: item.Fsinger_name,
-                icon: `https://y.gtimg.cn/music/photo_new/T001R150x150M000${item.Fsinger_mid}.jpg?max_age=2592000`
-              });
+                name: item.Fsinger_name
+              }));
             }
           }
         }
