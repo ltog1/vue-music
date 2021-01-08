@@ -8,69 +8,118 @@ const PLAY_MAX_LENGTH = 200;
 const FAVORITE_KEY = '_favorite_';
 const FAVORITE_MAX_LENGTH = 200;
 
-// 保存搜索历史
-export function saveSearch(query) {
-  let searchList = JSON.parse(window.localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
 
-  let index = searchList.indexOf(query);
+function insertArray(list,fn,length,val) {
+  let index = list.findIndex(fn);
   if (index > -1) {
-    searchList.splice(index,1);
+    list.splice(index,1)
   }
 
-  if (searchList.length >= SEARCH_MAX_LENGTH) {
-    searchList.pop();
+  if (list.length >= length) {
+    list.pop();
   }
+  list.unshift(val);
+}
 
-  searchList.unshift(query);
+function deleteFromArray(list,fn) {
+  let index = list.findIndex(fn);
+  if (index > -1) {
+    list.splice(index,1);
+  }
+}
+
+
+// 保存搜索历史
+function saveSearch(query) {
+  let searchList = getSearch();
+
+  insertArray(searchList,(item) => {
+    return item === query;
+  },SEARCH_MAX_LENGTH,query);
+
   window.localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchList));
   return searchList;
 }
 
 // 获取搜索历史
-export function getSearch() {
+function getSearch() {
   let searchList = JSON.parse(window.localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
   return searchList;
 }
 
-export function clearSearch() {
+function clearSearch() {
   window.localStorage.removeItem(SEARCH_HISTORY_KEY);
   return [];
 }
 
-export function deleteOne(key) {
+
+function deleteOne(key) {
   let searchList = getSearch();
-  let index = searchList.indexOf(key);
-  if (index > -1) {
-    searchList.splice(index,1);
-  }
+
+  deleteFromArray(searchList,(item) => {
+    return item === key;
+  });
+
   window.localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchList));
   return searchList;
 }
 
 // 保存播放列表
-export function savePlay(song) {
-  let playList = JSON.parse(window.localStorage.getItem(PLAY_KEY)) || [];
+function savePlay(song) {
+  let playList = getPlay();
 
-  let index = playList.findIndex(item => {
+  insertArray(playList,(item) => {
     return item.id === song.id;
-  })
-  if (index > -1) {
-    playList.splice(index,1);
-  }
+  },PLAY_MAX_LENGTH,song);
 
-  if (playList.length >= PLAY_MAX_LENGTH) {
-    playList.pop();
-  }
-
-  playList.unshift(song);
   window.localStorage.setItem(PLAY_KEY, JSON.stringify(playList));
   return playList;
 }
 
 // 获取播放列表
-export function getPlay() {
+function getPlay() {
   let playList = JSON.parse(window.localStorage.getItem(PLAY_KEY)) || [];
   return playList;
 }
 
+// 保存收藏列表
+function saveFavorite(song) {
+  let favoriteList = getFavorite();
 
+  insertArray(favoriteList,(item) => {
+    return item.id === song.id;
+  },FAVORITE_MAX_LENGTH,song);
+
+  window.localStorage.setItem(FAVORITE_KEY, JSON.stringify(favoriteList));
+  return favoriteList;
+}
+
+// 删除某个收藏歌曲
+function deleteFavorite(song) {
+  let favoriteList = getFavorite();
+
+  deleteFromArray(favoriteList,(item) => {
+    return item.id === song.id;
+  });
+
+  window.localStorage.setItem(FAVORITE_KEY, JSON.stringify(favoriteList));
+  return favoriteList;
+}
+
+// 获取收藏列表
+function getFavorite() {
+  let favoriteList = JSON.parse(window.localStorage.getItem(FAVORITE_KEY)) || [];
+  return favoriteList;
+}
+
+export default {
+  saveSearch,
+  getSearch,
+  clearSearch,
+  deleteOne,
+  savePlay,
+  getPlay,
+  saveFavorite,
+  deleteFavorite,
+  getFavorite,
+}

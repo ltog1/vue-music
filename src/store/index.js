@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createLogger from 'vuex/dist/logger'
 import { shuffle } from 'common/js/util'
-import { getSearch,saveSearch,deleteOne,clearSearch,savePlay,getPlay } from 'common/js/cache'
+import cache from 'common/js/cache'
 
 Vue.use(Vuex)
 
@@ -31,9 +31,9 @@ export default new Vuex.Store({
     sequenceList: [], // 顺序播放列表
     mode: playMode.sequence, // 播放方式(顺序0/循环1/随机2)
     currentIndex: -1,
-    searchHistory: getSearch(),
-    playHistory: getPlay(),
-    favoriteList: []
+    searchHistory: cache.getSearch(),
+    playHistory: cache.getPlay(),
+    favoriteList: cache.getFavorite()
   },
   getters: {
     singer(state) {
@@ -186,16 +186,16 @@ export default new Vuex.Store({
       commit('setFullScreen', true);
     },
     saveSearchHistory({ commit }, query) {
-      commit('setSearchHistory',saveSearch(query));
+      commit('setSearchHistory',cache.saveSearch(query));
     },
     deleteSearchHistory({ commit }, query) {
-      commit('setSearchHistory',deleteOne(query));
+      commit('setSearchHistory',cache.deleteOne(query));
     },
     clearSearchHistory({ commit }) {
-      commit('setSearchHistory',clearSearch());
+      commit('setSearchHistory',cache.clearSearch());
     },
     savePlayHistory({ commit }, song) {
-      commit('setPlayHistory',savePlay(song));
+      commit('setPlayHistory',cache.savePlay(song));
     },
     deletePlaySong({ commit,state }, song) {
       let playList = state.playList.concat();
@@ -223,6 +223,12 @@ export default new Vuex.Store({
       commit('setSequenceList', []);
       commit('setCurrentIndex', -1);
       commit('setPlaying', false);
+    },
+    saveFavorite({ commit }, song) {
+      commit('setFavoriteList',cache.saveFavorite(song));
+    },
+    deleteFavorite({ commit }, song) {
+      commit('setFavoriteList',cache.deleteFavorite(song));
     }
   },
   modules: {

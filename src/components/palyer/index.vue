@@ -58,7 +58,7 @@
               <i :class="[ playing ? 'icon-pause': 'icon-play' ]" @click="togglePlaying"></i>
             </div>
             <div class="icon i-right"><i class="icon-next" @click="next"></i></div>
-            <div class="icon i-right"><i class="icon-not-favorite"></i></div>
+            <div class="icon i-right" @click="$_toggleFavorite(currentSong)"><i :class="$_getFavoriteIcon(currentSong)"></i></div>
           </div>
         </div>
       </div>
@@ -323,6 +323,11 @@
           return;
         }
 
+        if (this.playList.length === 1) {
+          this.$refs.audio.currentTime = 0;
+          this.$refs.audio.play();
+        }
+
         let index = this.currentIndex - 1;
         if (index < 0) {
           index = this.playList.length - 1;
@@ -333,6 +338,11 @@
       next() {
         if (!this.songReady) {
           return;
+        }
+
+        if (this.playList.length === 1) {
+          this.$refs.audio.currentTime = 0;
+          this.$refs.audio.play();
         }
 
         let index = this.currentIndex + 1;
@@ -353,11 +363,10 @@
           this.currentLyric.togglePlay();
         }
 
-        const audio = this.$refs.audio;
         if (this.playing) {
-          audio.play();
+          this.$refs.audio.play();
         } else {
-          audio.pause();
+          this.$refs.audio.pause();
           if (this.fullScreen) {
             this.syncWrapperTransform(this.$refs.middleImageWrapper, this.$refs.middleImage);
           } else {
@@ -365,16 +374,11 @@
           }
         }
       },
-      showPlaylist() {
-        this.$refs.playlist.show();
-      },
       // 播放完毕
       ended() {
-        let mode = this.mode,
-            audio = this.$refs.audio;
-        if (mode === 1 || this.playList.length === 1) { // 循环播放
-          audio.currentTime = 0;
-          audio.play();
+        if (this.mode === 1 || this.playList.length === 1) { // 循环播放
+          this.$refs.audio.currentTime = 0;
+          this.$refs.audio.play();
           if (this.currentLyric) {
             this.currentLyric.play();
           }
@@ -416,6 +420,9 @@
       },
       timeupdate() {
         this.currentTime = this.$refs.audio.currentTime;
+      },
+      showPlaylist() {
+        this.$refs.playlist.show();
       },
       back() {
         this.setFullScreen(false);

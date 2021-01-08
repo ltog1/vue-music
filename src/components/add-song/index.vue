@@ -46,7 +46,6 @@
   import { searchMixin } from 'common/js/mixin'
   import { Song } from 'common/js/song'
   import { mapGetters, mapActions } from 'vuex'
-  import qs from 'qs'
   export default {
     name: "index",
     components: {
@@ -118,7 +117,7 @@
         this.insertSong(new Song(song));
       },
       // 点击选择搜索列表
-      selectSearchList(item) {
+      selectSearchList() {
         this.topTipShow = true;
         this.$_saveSearch();
       },

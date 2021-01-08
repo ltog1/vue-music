@@ -47,6 +47,11 @@ const routes = [
       name: 'singer-detail',
       component: () => import(/* webpackChunkName: "singer-detail" */ 'components/singer-detail/index'),
     }]
+  },
+  {
+    path: '/user',
+    name: 'user',
+    component: () => import(/* webpackChunkName: "user" */ 'components/user-center/index'),
   }
 ]
 

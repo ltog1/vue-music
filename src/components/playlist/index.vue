@@ -14,7 +14,7 @@
             <li class="item" v-for="item in sequenceList" :key="item.id" @click="selectItem(item)">
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{ item.name }}</span>
-              <span class="like"><i class="icon-not-favorite"></i></span>
+              <span class="like" @click.stop="$_toggleFavorite(item)"><i :class="$_getFavoriteIcon(item)"></i></span>
               <span class="delete" @click.stop="deleteOne(item)"><i class="icon-delete"></i></span>
             </li>
           </transition-group>

@@ -1,4 +1,3 @@
-
 export function addClass(el,className) {
   if (el.classList.contains(className)) {
     return className;

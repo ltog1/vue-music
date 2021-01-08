@@ -34,7 +34,8 @@ export const playerMixin = {
       'mode',
       'playList',
       'currentSong',
-      'sequenceList'
+      'sequenceList',
+      'favoriteList'
     ]),
     $_iconMode() {
       return this.mode === 0 ? 'icon-sequence' : this.mode === 1 ? 'icon-loop' : 'icon-random';
@@ -65,10 +66,35 @@ export const playerMixin = {
       });
       this.setCurrentIndex(index);
     },
+    isFavorite(song) {
+      let list = this.favoriteList.concat();
+      let index = list.findIndex(item => {
+        return item.id === song.id;
+      });
+      return index !== -1;
+    },
+    $_getFavoriteIcon(song) {
+      if (this.isFavorite(song)) {
+        return 'icon-favorite'
+      } else {
+        return 'icon-not-favorite';
+      }
+    },
+    $_toggleFavorite(song) {
+      if (this.isFavorite(song)) {
+        this.deleteFavorite(song);
+      } else {
+        this.saveFavorite(song);
+      }
+    },
     ...mapMutations([
       'setMode',
       'setCurrentIndex',
       'setPlayList'
+    ]),
+    ...mapActions([
+      'saveFavorite',
+      'deleteFavorite'
     ])
   }
 }
